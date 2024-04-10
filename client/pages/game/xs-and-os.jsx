@@ -1,35 +1,65 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Alert, Box, Button, IconButton, CardMedia, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, IconButton, CardMedia, Grid, Paper, TextField, Typography } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People';
 import InfoIcon from '@mui/icons-material/Info';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PersonIcon from '@mui/icons-material/Person';
+import io from 'socket.io-client';
 
 const gameDetails = { name: 'Xs and Os', description: 'Simple naughts and crosses!', status: true, imageName: '/xs_os.svg', colour: '#25309B', detailedInfo: 'Tic-tac-toe, noughts and crosses, or Xs and Os is a paper-and-pencil game for two players who take turns marking the spaces in a three-by-three grid with X or O. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row is the winner.', numPlayers: '2'};
 const gameRules = "The game is played on a grid that is 3 squares by 3 squares. One player is randomly selected as X and the other is O. Players take turns putting their marks in empty squares. The first player to get 3 of their marks in a row (up, down, across, or diagonally) is the winner. When all 9 squares are full, the game is over. If no player has 3 marks in a row, the game ends in a tie."
 const validRoomCode = false;
 
-const XODescription = () => {
+const socket = io('http://localhost:8000');
+
+const XODescription = ({ nickname }) => {
     const [roomCode, setRoomCode] = useState("");
     const [room, setRoom] = useState(false);
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
 
-    const handleCreateRoom = () => {
-        setRoom(true);
-        setRoomCode("abc-def");
-    };
-    const handleJoinRoom = (roomCode) => {
-        if (!validRoomCode) {
-            setAlertMessage('Invalid room code!');
-            setAlertOpen(true);
-        } else {
+    useEffect(() => {
+        socket.on('roomCreated', ({ roomId, gameType }) => {
+            setRoomCode(roomId);
             setRoom(true);
+        });
+
+        socket.on('roomJoined', roomId => {
+            setRoom(true);
+        });
+
+        socket.on('error', message => {
+            setAlertMessage(message);
+            setAlertOpen(true);
+        });
+
+        return () => {
+            socket.off('roomCreated');
+            socket.off('roomJoined');
+            socket.off('error');
+        }
+    }, []);
+
+    const handleCreateRoom = () => {
+        socket.emit('createRoom', { gameType: 'xsAndOs'});
+    };
+
+    const handleJoinRoom = (roomCode) => {
+        if (roomCode) {
+            socket.emit('joinRoom', roomCode);
+        } else {
+            setAlertMessage('Please enter a valid room code.');
+            setAlertOpen(true);
         }
     };
+
+    if (room) {
+        // If the user has created or join a room, display the game page
+        return <XOGame roomCode={roomCode} nickname={nickname} />
+    }
 
     return (
         <>
@@ -55,6 +85,7 @@ const XODescription = () => {
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                     <Button
+                        onClick={handleCreateRoom}
                         variant="outlined"
                         sx={{
                             mt: 2,
@@ -73,7 +104,7 @@ const XODescription = () => {
                     <TextField
                         InputProps={{
                             endAdornment: (
-                                <IconButton onClick={handleJoinRoom}>
+                                <IconButton onClick={() => handleJoinRoom(roomCode)}>
                                     <ArrowForwardIosIcon />
                                 </IconButton>
                             ),
@@ -95,6 +126,45 @@ const XODescription = () => {
                     />
                 </Box>
             </Box>
+        </>
+    );
+};
+
+const XOGame = ({ roomCode, nickname }) => {
+    const handleCellClick = (row, col) => {
+        console.log(`Clicked cell ${row}, ${col}`);
+        // Here, you would handle the game logic
+    };
+
+    return (
+        <>
+            <Box sx={{ padding: 3, gap: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Typography>Room Code: {roomCode}</Typography>
+                <Typography>Nickname: {nickname}</Typography>
+            </Box>
+            <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ maxWidth: 300, margin: 'auto', padding: 3 }}>
+                {Array.from({ length: 3 }).map((_, rowIndex) => (
+                <Grid key={rowIndex} container item xs={12} spacing={2} justifyContent="center">
+                    {Array.from({ length: 3 }).map((_, colIndex) => (
+                    <Grid key={`${rowIndex}-${colIndex}`} item xs={4}>
+                        <Paper
+                            elevation={3}
+                            sx={{
+                                height: 100,
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                cursor: 'pointer',
+                            }}
+                            onClick={() => handleCellClick(rowIndex, colIndex)}
+                        >
+                        {/* Cell Content Here */}
+                        </Paper>
+                    </Grid>
+                    ))}
+                </Grid>
+                ))}
+            </Grid>
         </>
     );
 };
@@ -156,7 +226,7 @@ const XsAndOs = () => {
                     marginTop: 2,
                 }}
             >
-                <XODescription />
+                <XODescription nickname={nickname}/>
             </Box>
         </Box>
     );
