@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Alert, Box, Button, IconButton, CardMedia, Grid, Paper, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Chip, Dialog, DialogTitle, IconButton, CardMedia, Grid, Paper, TextField, Typography } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People';
 import InfoIcon from '@mui/icons-material/Info';
@@ -78,44 +78,120 @@ const XODescription = ({ nickname, handleCreateRoom, handleJoinRoom }) => {
     );
 };
 
-const XOGame = ({ roomId, room }) => {
+const XOGame = ({ roomId, room, nickname }) => {
     const [gameStart, setGameStart] = useState(false);
-    const [gameState, setGameState] = useState([]);
-    const [alertOpen, setAlertOpen] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
+    const initialGameState = [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+    ];
+    
+    const [gameState, setGameState] = useState(initialGameState);
+    const [playerSymbol, setPlayerSymbol] = useState('');
+    const [currentTurn, setCurrentTurn] = useState('');
+    const [gameDraw, setGameDraw] = useState(false);
+    const [gameWon, setGameWon] = useState(false);
+    const [winner, setWinner] = useState('');
+    const [openDialog, setOpenDialog] = useState(false);
 
     useEffect(() => {
-        socket.on('gameStarted', gameState => {
+        socket.on('gameStarted', ({ gameState, playerSymbols, currentTurn}) => {
+            setOpenDialog(false);
             setGameState(gameState);
+            setPlayerSymbol(playerSymbols[nickname]);
+            setCurrentTurn(currentTurn);
             setGameStart(true);
         });
-        socket.on('error', message => {
-            setAlertMessage(message);
-            setAlertOpen(true);
+
+        socket.on('moveMade', ({ gameState, currentTurn }) => {
+            console.log("Move Made");
+            setGameState(gameState);
+            setCurrentTurn(currentTurn);
         });
+
+        socket.on('gameWon', winner => {
+            console.log('Game Won');
+            setGameWon(true);
+            setWinner(winner);
+            setOpenDialog(true);
+        })
+
+        socket.on('gameDraw', _ => {
+            console.log('Game Draw');
+            setGameDraw(true);
+            setOpenDialog(true);
+        })
 
         return () => {
             socket.off('gameStarted');
-            socket.off('error');
+            socket.off('moveMade');
         }
-    }, []);
+    }, [nickname]);
 
     const handleStartGame = (roomId) => {
         socket.emit('startGame', { gameType: 'xsAndOs', 'roomId': roomId });
     };
 
+    const handleCloseDialog = (roomId) => {
+        setOpenDialog(false);
+        setGameStart(false);
+        setGameState(initialGameState);
+        setPlayerSymbol('');
+        setCurrentTurn('');
+        setGameDraw(false);
+        setGameWon(false);
+        setWinner('');
+        socket.emit('restartGame', roomId);
+    };
+
+    const handlePlayAgain = (roomId) => {
+        handleCloseDialog(roomId);
+    };
+
     const handleCellClick = (row, col) => {
-        console.log(`Clicked cell ${row}, ${col}`);
-        // Here, you would handle the game logic
+        console.log(`Clicked cell ${row}, ${col} Game started: ${gameStart}, Current turn: ${currentTurn}`);
+        if (gameState[row]?.[col] === '' && gameStart && currentTurn === nickname) {
+            console.log("Making Move")
+            const move = { row, col, player: playerSymbol };
+            socket.emit('xsAndOsMove', { roomId, move });
+        } else {
+            console.log("Not Making Move");
+        }
     };
 
     return (
         <>
+            <Dialog open={(gameWon || gameDraw) && openDialog} onClose={() => handleCloseDialog(roomId)} maxWidth="sm" fullWidth>
+                <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 2, padding: 3 }}>
+                    {gameWon && (
+                        <DialogTitle sx={{ flex: 1 }}>🎉 {winner} Won 🎉</DialogTitle>
+                    )}
+                    {gameDraw && (
+                        <DialogTitle sx={{ flex: 1 }}>😁 Game Draw 😁</DialogTitle>
+                    )}
+                    <Button
+                        onClick={() => handlePlayAgain(roomId)}
+                        variant="outlined"
+                        sx={{
+                            mt: 2,
+                            height: 40,
+                            borderColor: gameDetails.colour,
+                            color: gameDetails.colour,
+                            '&:hover': {
+                                backgroundColor: gameDetails.colour,
+                                color: '#fff',
+                            },
+                        }}
+                    >
+                        Play Again?
+                    </Button>
+                </Box>
+            </Dialog>
             <Box sx={{ padding: 3, gap: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Typography>Room Code: {roomId}</Typography>
                 <Typography>Players: {room.players.join(',')}</Typography>
                 {
-                    !gameStart && (
+                    !gameStart ? (
                         <Button
                             onClick={() => handleStartGame(roomId)}
                             variant="outlined"
@@ -132,30 +208,39 @@ const XOGame = ({ roomId, room }) => {
                         >
                             Start Game
                         </Button>
+                    ) : (
+                        <Typography component="div">
+                            {currentTurn === nickname ? "Your Turn" : "Opponent's Turn"}
+                            <Chip label={`${playerSymbol} (You)`} color="primary" variant="outlined" />
+                        </Typography>
                     )
                 }
             </Box>
             <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ maxWidth: 400, margin: 'auto', padding: 3 }}>
                 {Array.from({ length: 3 }).map((_, rowIndex) => (
-                <Grid key={rowIndex} container item xs={12} spacing={2} justifyContent="center">
-                    {Array.from({ length: 3 }).map((_, colIndex) => (
-                    <Grid key={`${rowIndex}-${colIndex}`} item xs={4}>
-                        <Paper
-                            elevation={3}
-                            sx={{
-                                height: 100,
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                cursor: 'pointer',
-                            }}
-                            onClick={() => handleCellClick(rowIndex, colIndex)}
-                        >
-                        {/* Cell Content Here */}
-                        </Paper>
+                    <Grid key={`row-${rowIndex}`} container item xs={12} spacing={2} justifyContent="center">
+                        {Array.from({ length: 3 }).map((_, colIndex) => (
+                            <Grid key={`cell-${rowIndex}-${colIndex}`} item xs={4}>
+                                <Paper
+                                    elevation={3}
+                                    sx={{
+                                        height: 100,
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        cursor: 'pointer',
+                                        backgroundImage: gameState[rowIndex]?.[colIndex] ? `url(/xsAndOs/${gameState[rowIndex][colIndex].toLowerCase()}.svg)` : 'none',
+                                        backgroundSize: 'contain',
+                                        backgroundRepeat: 'no-repeat',
+                                        backgroundPosition: 'center'
+                                    }}
+                                    onClick={() => handleCellClick(rowIndex, colIndex)}
+                                >
+                                    {/* Optional: Display text or other elements on top */}
+                                </Paper>
+                            </Grid>
+                        ))}
                     </Grid>
-                    ))}
-                </Grid>
                 ))}
             </Grid>
         </>
@@ -241,7 +326,12 @@ const XsAndOs = () => {
     };
 
     const handleNavigateHome = (roomId, nickname) => {
-        handleLeaveRoom(roomId, nickname);
+        if (roomJoined) {
+            handleLeaveRoom(roomId, nickname);
+        } else {
+            const gamesPath = `/games?nickname=${encodeURIComponent(nickname)}`;
+            router.push(gamesPath);
+        }
     };
 
     return (
@@ -308,7 +398,12 @@ const XsAndOs = () => {
                     }}
                 >
                     {roomJoined ?
-                        <XOGame roomId={roomId} room={room} handleLeaveRoom={handleLeaveRoom} />
+                        <XOGame
+                            roomId={roomId}
+                            room={room}
+                            nickname={nickname}
+                            handleLeaveRoom={handleLeaveRoom}
+                        />
                         :
                         <XODescription
                             nickname={nickname}

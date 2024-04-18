@@ -1,5 +1,6 @@
 const express = require('express')
 const http = require('http');
+const { start } = require('repl');
 const { Server } = require('socket.io')
 // Import Games
 const xsAndOs = require('./games/xsAndOs')
@@ -101,16 +102,52 @@ io.on('connection', (socket) => {
 
   // Game Start
   socket.on('startGame', ({gameType, roomId}) => {
-    if (gameType == "xsAndOs" && xsAndOs.checkGameStart(rooms, roomId)) {
-      const gameState = xsAndOs.createInitialGameState();
-      io.to(roomId).emit('gameStarted', gameState);
+    if (gameType == "xsAndOs") {
+      const result = xsAndOs.initializeGame(rooms, roomId);
+      if (result.error) {
+        socket.emit('error', result.error);
+      } else {
+        io.to(roomId).emit('gameStarted', result);
+      }
+    }
+  });
+
+  // Game Restart
+  socket.on('restartGame', roomId => {
+    if (!rooms[roomId]) {
+      socket.emit('error', 'Room does not exist.');
+      return;
+    }
+
+    const result = xsAndOs.initializeGame(rooms, roomId);
+    if (result.error) {
+        socket.emit('error', result.error);
+    } else {
+        io.to(roomId).emit('gameStarted', result);
     }
   });
 
   // You can also listen for Xs and Os specific events and handle them
-  socket.on('xsAndOsMove', ({roomId, move}) => {
-    const result = xsAndOs.makeMove(rooms[roomId].gameState, move);
-    io.to(roomId).emit('moveMade', result);
+  socket.on('xsAndOsMove', ({ roomId, move }) => {
+    const room = rooms[roomId];
+    if (move.player === room.playerSymbols[room.currentTurn]) {
+      const result = xsAndOs.makeMove(room.gameState, move);
+      if (!result.error) {
+        room.currentTurn = room.players.find(p => p !== room.currentTurn);
+        io.to(roomId).emit('moveMade', { gameState: room.gameState, currentTurn: room.currentTurn });
+
+        if (result.winner) {
+          const winnerName = Object.keys(room.playerSymbols).find(key => room.playerSymbols[key] === result.winner);
+          io.to(roomId).emit('gameWon', winnerName);
+        } else if (result.draw) {
+          io.to(roomId).emit('gameDraw');
+        }
+      } else {
+        socket.emit('error', 'Invalid move.');
+      }
+    } else {
+      socket.emit('error', 'Not your turn.');
+    }
   });
 });
 
