@@ -11,67 +11,15 @@ import io from 'socket.io-client';
 
 const gameDetails = { name: 'Xs and Os', description: 'Simple naughts and crosses!', status: true, imageName: '/xs_os.svg', colour: '#25309B', detailedInfo: 'Tic-tac-toe, noughts and crosses, or Xs and Os is a paper-and-pencil game for two players who take turns marking the spaces in a three-by-three grid with X or O. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row is the winner.', numPlayers: '2'};
 const gameRules = "The game is played on a grid that is 3 squares by 3 squares. One player is randomly selected as X and the other is O. Players take turns putting their marks in empty squares. The first player to get 3 of their marks in a row (up, down, across, or diagonally) is the winner. When all 9 squares are full, the game is over. If no player has 3 marks in a row, the game ends in a tie."
-const validRoomCode = false;
 
 const socket = io('http://localhost:8000');
 
-const XODescription = ({ nickname }) => {
-    const [roomCode, setRoomCode] = useState("");
-    const [room, setRoom] = useState(false);
-    const [alertOpen, setAlertOpen] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
 
-    useEffect(() => {
-        socket.on('roomCreated', ({ roomId, gameType }) => {
-            setRoomCode(roomId);
-            setRoom(true);
-        });
-
-        socket.on('roomJoined', roomId => {
-            setRoom(true);
-        });
-
-        socket.on('error', message => {
-            setAlertMessage(message);
-            setAlertOpen(true);
-        });
-
-        return () => {
-            socket.off('roomCreated');
-            socket.off('roomJoined');
-            socket.off('error');
-        }
-    }, []);
-
-    const handleCreateRoom = () => {
-        socket.emit('createRoom', { gameType: 'xsAndOs'});
-    };
-
-    const handleJoinRoom = (roomCode) => {
-        if (roomCode) {
-            socket.emit('joinRoom', roomCode);
-        } else {
-            setAlertMessage('Please enter a valid room code.');
-            setAlertOpen(true);
-        }
-    };
-
-    if (room) {
-        // If the user has created or join a room, display the game page
-        return <XOGame roomCode={roomCode} nickname={nickname} />
-    }
+const XODescription = ({ nickname, handleCreateRoom, handleJoinRoom }) => {
+    const [roomId, setRoomId] = useState('');
 
     return (
         <>
-            {alertOpen && (
-                <Alert 
-                    severity="error" 
-                    onClose={() => setAlertOpen(false)}
-                    sx={{ marginBottom: 2, borderRadius: "10px" }}
-                >
-                    {alertMessage}
-                </Alert>
-            )}
             <Box sx={{ padding: 3, gap: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2}}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -104,7 +52,7 @@ const XODescription = ({ nickname }) => {
                     <TextField
                         InputProps={{
                             endAdornment: (
-                                <IconButton onClick={() => handleJoinRoom(roomCode)}>
+                                <IconButton onClick={() => handleJoinRoom(roomId, nickname)}>
                                     <ArrowForwardIosIcon />
                                 </IconButton>
                             ),
@@ -121,8 +69,8 @@ const XODescription = ({ nickname }) => {
                             },
                         }}
                         label="Enter room code"
-                        value={roomCode}
-                        onChange={(e) => setRoomCode(e.target.value)}
+                        value={roomId}
+                        onChange={(e) => setRoomId(e.target.value)}
                     />
                 </Box>
             </Box>
@@ -130,7 +78,32 @@ const XODescription = ({ nickname }) => {
     );
 };
 
-const XOGame = ({ roomCode, nickname }) => {
+const XOGame = ({ roomId, room }) => {
+    const [gameStart, setGameStart] = useState(false);
+    const [gameState, setGameState] = useState([]);
+    const [alertOpen, setAlertOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+
+    useEffect(() => {
+        socket.on('gameStarted', gameState => {
+            setGameState(gameState);
+            setGameStart(true);
+        });
+        socket.on('error', message => {
+            setAlertMessage(message);
+            setAlertOpen(true);
+        });
+
+        return () => {
+            socket.off('gameStarted');
+            socket.off('error');
+        }
+    }, []);
+
+    const handleStartGame = (roomId) => {
+        socket.emit('startGame', { gameType: 'xsAndOs', 'roomId': roomId });
+    };
+
     const handleCellClick = (row, col) => {
         console.log(`Clicked cell ${row}, ${col}`);
         // Here, you would handle the game logic
@@ -139,10 +112,30 @@ const XOGame = ({ roomCode, nickname }) => {
     return (
         <>
             <Box sx={{ padding: 3, gap: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <Typography>Room Code: {roomCode}</Typography>
-                <Typography>Nickname: {nickname}</Typography>
+                <Typography>Room Code: {roomId}</Typography>
+                <Typography>Players: {room.players.join(',')}</Typography>
+                {
+                    !gameStart && (
+                        <Button
+                            onClick={() => handleStartGame(roomId)}
+                            variant="outlined"
+                            sx={{
+                                mt: 2,
+                                height: 40,
+                                borderColor: gameDetails.colour,
+                                color: gameDetails.colour,
+                                '&:hover': {
+                                    backgroundColor: gameDetails.colour,
+                                    color: '#fff',
+                                },
+                            }}
+                        >
+                            Start Game
+                        </Button>
+                    )
+                }
             </Box>
-            <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ maxWidth: 300, margin: 'auto', padding: 3 }}>
+            <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ maxWidth: 400, margin: 'auto', padding: 3 }}>
                 {Array.from({ length: 3 }).map((_, rowIndex) => (
                 <Grid key={rowIndex} container item xs={12} spacing={2} justifyContent="center">
                     {Array.from({ length: 3 }).map((_, colIndex) => (
@@ -172,63 +165,160 @@ const XOGame = ({ roomCode, nickname }) => {
 const XsAndOs = () => {
     const router = useRouter();
     const { nickname: encodedNickname } = router.query;
-    const nickname = decodeURIComponent(encodedNickname || 'captain_underpants');
-    // Clicking home button
-    const handleClick = () => {
-        router.push({
-          pathname: '/games',
-          query: { nickname },
+    const nickname = decodeURIComponent(encodedNickname);
+
+    // Error management
+    const [alertOpen, setAlertOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+
+    // Room state management
+    const [roomId, setRoomId] = useState("");
+    const [room, setRoom] = useState({});
+    const [roomJoined, setRoomJoined] = useState(false);
+
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            socket.emit('leaveRoom', { roomId, nickname });
+        };
+    
+        window.addEventListener('beforeunload', handleBeforeUnload);
+    
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [roomId, nickname]);
+    
+    useEffect(() => {
+        socket.on('roomCreated', ({ roomId, room }) => {
+            setRoomId(roomId);
+            setRoomJoined(true);
+            setRoom(room);
         });
+
+        socket.on('roomJoined', room => {
+            setRoomJoined(true);
+            setRoom(room);
+        });
+
+        socket.on('playerLeft', ({ nickname }) => {
+            setRoom(prevRoom => ({
+                ...prevRoom,
+                players: prevRoom.players.filter(player => player !== nickname)
+            }));
+        });
+
+        socket.on('error', message => {
+            setAlertMessage(message);
+            setAlertOpen(true);
+        });
+
+        return () => {
+            socket.off('roomCreated');
+            socket.off('roomJoined');
+            socket.off('error');
+        }
+    }, []);
+
+    const handleCreateRoom = () => {
+        socket.emit('createRoom', { gameType: 'xsAndOs', nickname: nickname});
+    };
+
+    const handleJoinRoom = (roomId, nickname) => {
+        if (roomId && nickname) {
+            socket.emit('joinRoom', { roomId, nickname });
+            setRoomId(roomId);
+        } else {
+            setAlertMessage('Please enter a valid room code.');
+            setAlertOpen(true);
+        }
+    };
+
+    const handleLeaveRoom = (roomId, nickname) => {
+        setRoomJoined(false);
+        setRoom({});
+        setRoomId("");
+        socket.emit('leaveRoom', { roomId, nickname });
+    };
+
+    const handleNavigateHome = (roomId, nickname) => {
+        handleLeaveRoom(roomId, nickname);
     };
 
     return (
-        <Box sx={{ 
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            flexGrow: 1, 
-            p: 3,
-            width: '100%',
-            maxHeight: '100vh'
-        }}>
+        <>
+            {alertOpen && (
+                <Alert 
+                    severity="error"
+                    onClose={() => setAlertOpen(false)}
+                    sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        zIndex: 1000,
+                        marginBottom: 2
+                    }}
+                >
+                    {alertMessage}
+                </Alert>
+            )}
             <Box sx={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                flexGrow: 1, 
+                p: 3,
                 width: '100%',
-                position: 'relative',
+                maxHeight: '100vh'
             }}>
-                <IconButton aria-label="home" size="large" onClick={handleClick} sx={{ position: 'absolute', left: 0 }}>
-                    <ArrowBackIcon fontSize="inherit"/>
-                </IconButton>
-                <CardMedia
-                    component="img"
-                    image="/banners/xs_os.svg"
-                    alt="Xs and Os"
-                    sx={{ maxWidth: "60%", height: "20vh" }}
-                />
                 <Box sx={{ 
-                    position: 'absolute', 
-                    right: 0,
-                    display: 'flex',
-                    alignItems: 'center',
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    width: '100%',
+                    position: 'relative',
                 }}>
-                    <PersonIcon />
-                    <Typography>{nickname}</Typography>
+                    <IconButton aria-label="home" size="large" onClick={() => handleNavigateHome(roomId, nickname)} sx={{ position: 'absolute', left: 0 }}>
+                        <ArrowBackIcon fontSize="inherit"/>
+                    </IconButton>
+                    <CardMedia
+                        component="img"
+                        image="/banners/xs_os.svg"
+                        alt="Xs and Os"
+                        sx={{ maxWidth: "60%", height: "20vh" }}
+                    />
+                    <Box sx={{ 
+                        position: 'absolute', 
+                        right: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}>
+                        <PersonIcon />
+                        <Typography>{nickname}</Typography>
+                    </Box>
+                </Box>
+                <Box
+                    sx={{
+                        width: "75vw",
+                        borderRadius: "10px",
+                        border: "1px solid",
+                        borderColor: "primary.main",
+                        marginTop: 2,
+                        paddingBottom: 2,
+                    }}
+                >
+                    {roomJoined ?
+                        <XOGame roomId={roomId} room={room} handleLeaveRoom={handleLeaveRoom} />
+                        :
+                        <XODescription
+                            nickname={nickname}
+                            handleCreateRoom={handleCreateRoom}
+                            handleJoinRoom={handleJoinRoom}
+                        />
+                    }
                 </Box>
             </Box>
-            <Box
-                sx={{
-                    width: "75vw",
-                    borderRadius: "10px",
-                    border: "1px solid",
-                    borderColor: "primary.main",
-                    marginTop: 2,
-                }}
-            >
-                <XODescription nickname={nickname}/>
-            </Box>
-        </Box>
+        </>
     );
 };
 

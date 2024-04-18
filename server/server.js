@@ -16,6 +16,7 @@ const io = new Server(server, {
 const PORT = process.env.PORT || 8000;
 
 const rooms = {};
+const playerSessions = {};
 
 // Auxiliary Functions
 function generateRoomId() {
@@ -37,29 +38,72 @@ function createRoom(roomId, gameType, playerId) {
 
 io.on('connection', (socket) => {
   console.log('A user has connected', socket.id);
+  console.log(`Available Rooms: ${JSON.stringify(rooms)}`);
 
+  socket.on('disconnect', () => {
+    const playerId = playerSessions[socket.id];
+    if (playerId) {
+      Object.keys(rooms).forEach(roomId => {
+        const room = rooms[roomId];
+        const index = room.players.indexOf(playerId);
+        if (index !== -1) {
+          room.players.splice(index, 1);
+          if (room.players.length === 0) {
+            delete rooms[roomId];
+          } else {
+            io.to(roomId).emit('playerLeft', { playerId: playerId});
+          }
+        }
+      });
+    }
+    delete playerSessions[socket.id];
+  })
   // Handle creating/joining rooms and other general-purpose logic here
   // For game-specific actions, call functions from xsAndOs
 
   // Room Creation
-  socket.on('createRoom', ({ gameType }) => {
+  socket.on('createRoom', ({ gameType, nickname }) => {
     const roomId = generateRoomId();
-    const room = createRoom(roomId, gameType, socket.id);
+    const room = createRoom(roomId, gameType, nickname);
     console.log(`Created room: ${JSON.stringify(room)}`);
     // Store the details of the new room
     rooms[roomId] = room;
     socket.join(roomId);
-
-    socket.emit('roomCreated', { roomId, gameType });
+    socket.emit('roomCreated', { roomId, room });
   })
 
   // Room Joining
-  socket.on('joinRoom', (roomId) => {
-    if (xsAndOs.joinRoom(rooms, roomId, socket.id)) {
+  socket.on('joinRoom', ({ roomId, nickname }) => {
+    if (xsAndOs.joinRoom(rooms, roomId, nickname)) {
       socket.join(roomId);
-      io.to(roomId).emit('roomJoined', roomId);
+      playerSessions[socket.id] = nickname;
+      io.to(roomId).emit('roomJoined', rooms[roomId]);
+
+      console.log(`Player joined room: ${JSON.stringify(rooms[roomId])}`);
     } else {
-      socket.emit('error', 'Room is full or does not exist');
+      socket.emit('error', 'Already in the room or room is full.');
+    }
+  });
+
+  //Room Leaving
+  socket.on('leaveRoom', ({ roomId, nickname }) => {
+    if (xsAndOs.leaveRoom(rooms, roomId, nickname)) {
+      socket.leave(roomId);
+
+      if (rooms.hasOwnProperty(roomId)) {
+        socket.to(roomId).emit('playerLeft', { nickname });
+      }
+      console.log(`Player left room: ${JSON.stringify(rooms[roomId])}`);
+    } else {
+      socket.emit('error', 'Could not leave room: non-existent room or error occurred.')
+    }
+  })
+
+  // Game Start
+  socket.on('startGame', ({gameType, roomId}) => {
+    if (gameType == "xsAndOs" && xsAndOs.checkGameStart(rooms, roomId)) {
+      const gameState = xsAndOs.createInitialGameState();
+      io.to(roomId).emit('gameStarted', gameState);
     }
   });
 
