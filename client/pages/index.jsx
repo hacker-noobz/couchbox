@@ -41,7 +41,7 @@ export default function Home() {
           onChange={(e) => setNickname(e.target.value)}
         />
       </Box>
-      <Box textAlign="center" display="flex" flexDirection="column" alignItems="center" justifyContent="center"> {/* Adding padding at the bottom */}
+      <Box textAlign="center" display="flex" flexDirection="column" alignItems="center" justifyContent="center">
         <Avatar alt="Hacker Noobz" src="/hackernoobz.svg" sx={{ width: 56, height: 56 }}/>
         <Typography variant="overline" display="block" gutterBottom>
           Created by Hacker Noobz
