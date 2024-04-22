@@ -1,4 +1,9 @@
 build:
   docker:
-    web: ./client
-    api: ./server
+    web: ./client/Dockerfile
+    worker: ./server/Dockerfile
+release:
+  image: web
+run:
+  web: npm start --prefix client
+  worker: npm start --prefix server
