@@ -4,6 +4,7 @@ build:
     worker: server/Dockerfile
 
 release:
+  image: web
   command:
     - echo "Deployed!!!"
 
