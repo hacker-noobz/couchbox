@@ -2,9 +2,11 @@ build:
   docker:
     web: client/Dockerfile
     worker: server/Dockerfile
+
 release:
   command:
     - echo "Deployed!!!"
+
 run:
-  web: cd client && npm start
-  worker: cd server && npm start
+  web: npm start
+  worker: npm start
