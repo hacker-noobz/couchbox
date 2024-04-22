@@ -1,9 +1,10 @@
 build:
   docker:
-    web: ./client/Dockerfile
-    worker: ./server/Dockerfile
+    web: client/Dockerfile
+    worker: server/Dockerfile
 release:
-  image: web
+  command:
+    - echo "Deployed!"
 run:
-  web: npm start --prefix client
-  worker: npm start --prefix server
+  web: cd client && npm start
+  worker: cd server && npm start
