@@ -4,7 +4,7 @@ build:
     worker: server/Dockerfile
 release:
   command:
-    - echo "Deployed!"
+    - echo "Deployed!!!"
 run:
   web: cd client && npm start
   worker: cd server && npm start
