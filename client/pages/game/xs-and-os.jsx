@@ -12,6 +12,7 @@ const gameDetails = { name: 'Xs and Os', description: 'Simple naughts and crosse
 const gameRules = "The game is played on a grid that is 3 squares by 3 squares. One player is randomly selected as X and the other is O. Players take turns putting their marks in empty squares. The first player to get 3 of their marks in a row (up, down, across, or diagonally) is the winner. When all 9 squares are full, the game is over. If no player has 3 marks in a row, the game ends in a tie."
 
 const releaseEnvironment = process.env.environment;
+console.log(`Release Environment: ${releaseEnvironment}`);
 var URL = "http://localhost:8000";
 if (releaseEnvironment === "uat") {
   URL = "https://couchbox-f5c9bf2b16d5.herokuapp.com";
@@ -19,6 +20,7 @@ if (releaseEnvironment === "uat") {
   URL = "production-url";
 }
 
+console.log('Connecting to URL:', URL);
 const socket = io(URL);
 
 /**
