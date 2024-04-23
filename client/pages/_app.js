@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { SocketProvider } from 'socketProvider';
 
 const theme = createTheme({
   typography: {
@@ -19,10 +20,12 @@ export default function MyApp({ Component, pageProps }) {
           `}
         </style>
       </Head>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Component {...pageProps} />
-      </ThemeProvider>
+      <SocketProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </SocketProvider>
     </>
   );
 }

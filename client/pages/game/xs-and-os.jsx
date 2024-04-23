@@ -6,22 +6,10 @@ import InfoIcon from '@mui/icons-material/Info';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PersonIcon from '@mui/icons-material/Person';
-import io from 'socket.io-client';
+import { useSocket } from '../socketProvider';
 
 const gameDetails = { name: 'Xs and Os', description: 'Simple naughts and crosses!', status: true, imageName: '/xs_os.svg', colour: '#25309B', detailedInfo: 'Tic-tac-toe, noughts and crosses, or Xs and Os is a paper-and-pencil game for two players who take turns marking the spaces in a three-by-three grid with X or O. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row is the winner.', numPlayers: '2'};
 const gameRules = "The game is played on a grid that is 3 squares by 3 squares. One player is randomly selected as X and the other is O. Players take turns putting their marks in empty squares. The first player to get 3 of their marks in a row (up, down, across, or diagonally) is the winner. When all 9 squares are full, the game is over. If no player has 3 marks in a row, the game ends in a tie."
-
-const releaseEnvironment = process.env.RELEASE_ENV;
-console.log(`Release Environment: ${releaseEnvironment}`);
-var URL = "http://localhost:8000";
-if (releaseEnvironment === "uat") {
-  URL = "https://couchbox-f5c9bf2b16d5.herokuapp.com";
-} else if (releaseEnvironment === "production") {
-  URL = "production-url";
-}
-
-console.log('Connecting to URL:', URL);
-const socket = io(URL);
 
 /**
  * XODescription: information pane that contains rules about XsAndOs as well as functionality
@@ -99,7 +87,7 @@ const XODescription = ({ nickname, handleCreateRoom, handleJoinRoom }) => {
  * @param {object} room: the room object containing details such as players, game state etc.
  * @param {string} nickname: the current user's nickname. 
  */
-const XOGame = ({ roomId, room, nickname }) => {
+const XOGame = ({ roomId, room, nickname, socket }) => {
   const [gameStart, setGameStart] = useState(false);
   const initialGameState = [
     ['', '', ''],
@@ -269,6 +257,7 @@ const XOGame = ({ roomId, room, nickname }) => {
  */
 const XsAndOs = () => {
   const router = useRouter();
+  const socket = useSocket();
   const { nickname: encodedNickname } = router.query;
   const nickname = decodeURIComponent(encodedNickname);
 
@@ -423,6 +412,7 @@ const XsAndOs = () => {
               room={room}
               nickname={nickname}
               handleLeaveRoom={handleLeaveRoom}
+              socket={socket}
             />
             :
             <XODescription

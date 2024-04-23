@@ -19,6 +19,13 @@ const PORT = process.env.PORT || 8000;
 const rooms = {};
 const playerSessions = {};
 
+app.get('/config', (req, res) => {
+  const config = {
+    socketUrl: process.env.SOCKET_URL || "http://localhost:8000"
+  };
+  res.json(config);
+});
+
 // Auxiliary Functions
 function generateRoomId() {
   // Create a room id
