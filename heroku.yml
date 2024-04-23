@@ -9,5 +9,5 @@ release:
     - echo "Deployed!!!"
 
 run:
-  web: npm start
-  worker: npm start
+  web-client: npm start
+  worker-server: npm start
