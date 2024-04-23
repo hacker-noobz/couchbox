@@ -18,7 +18,7 @@ export const SocketProvider = ({ children }) => {
         console.log('Socket initialized');
         
         return () => newSocket.close();
-      });
+      }).catch(error => console.error('Failed to fetch config:', error));
   }, []);
 
   return (
