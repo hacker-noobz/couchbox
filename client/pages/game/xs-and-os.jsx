@@ -132,7 +132,7 @@ const XOGame = ({ roomId, room, nickname, socket }) => {
       socket.off('gameStarted');
       socket.off('moveMade');
     }
-  }, [nickname]);
+  }, [socket, nickname]);
 
   const handleStartGame = (roomId) => {
       socket.emit('startGame', { gameType: 'xsAndOs', 'roomId': roomId });
@@ -280,7 +280,7 @@ const XsAndOs = () => {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [roomId, nickname]);
+  }, [socket, roomId, nickname]);
     
   useEffect(() => {
     socket.on('roomCreated', ({ roomId, room }) => {
@@ -311,7 +311,7 @@ const XsAndOs = () => {
       socket.off('roomJoined');
       socket.off('error');
     }
-  }, []);
+  }, [socket]);
 
   const handleCreateRoom = () => {
     socket.emit('createRoom', { gameType: 'xsAndOs', nickname: nickname});
