@@ -10,4 +10,4 @@ release:
 
 run:
   web-client: npm start
-  worker-server: npm start
+  web-server: npm start
