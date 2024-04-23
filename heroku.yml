@@ -1,10 +1,10 @@
 build:
   docker:
-    web: client/Dockerfile
-    worker: server/Dockerfile
+    web-client: client/Dockerfile
+    web-server: server/Dockerfile
 
 release:
-  image: web
+  image: web-client
   command:
     - echo "Deployed!!!"
 

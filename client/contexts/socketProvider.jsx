@@ -7,7 +7,6 @@ export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
-  console.log('Release Environment: ', process.env.NEXT_PUBLIC_RELEASE_ENV);
   useEffect(() => {
     fetch('/config')
       .then(response => response.json())
