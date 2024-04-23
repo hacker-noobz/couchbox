@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
-import { SocketProvider } from 'socketProvider';
+import { SocketProvider } from './socketProvider';
 
 const theme = createTheme({
   typography: {
