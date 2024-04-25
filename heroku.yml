@@ -1,13 +1,11 @@
 build:
   docker:
-    web-client: client/Dockerfile
-    web-server: server/Dockerfile
+    web: server/Dockerfile
 
 release:
-  image: web-client
+  image: web
   command:
-    - echo "Deployed!!!"
+    - echo "Deployed Couchbox Backend Server!!!"
 
 run:
-  web-client: npm start
-  web-server: npm start
+  web: npm start
