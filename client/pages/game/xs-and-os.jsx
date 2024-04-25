@@ -6,12 +6,10 @@ import InfoIcon from '@mui/icons-material/Info';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PersonIcon from '@mui/icons-material/Person';
-import io from 'socket.io-client';
+import { useSocket } from '../../contexts/socketProvider';
 
 const gameDetails = { name: 'Xs and Os', description: 'Simple naughts and crosses!', status: true, imageName: '/xs_os.svg', colour: '#25309B', detailedInfo: 'Tic-tac-toe, noughts and crosses, or Xs and Os is a paper-and-pencil game for two players who take turns marking the spaces in a three-by-three grid with X or O. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row is the winner.', numPlayers: '2'};
 const gameRules = "The game is played on a grid that is 3 squares by 3 squares. One player is randomly selected as X and the other is O. Players take turns putting their marks in empty squares. The first player to get 3 of their marks in a row (up, down, across, or diagonally) is the winner. When all 9 squares are full, the game is over. If no player has 3 marks in a row, the game ends in a tie."
-
-const socket = io('http://localhost:8000');
 
 /**
  * XODescription: information pane that contains rules about XsAndOs as well as functionality
@@ -89,7 +87,7 @@ const XODescription = ({ nickname, handleCreateRoom, handleJoinRoom }) => {
  * @param {object} room: the room object containing details such as players, game state etc.
  * @param {string} nickname: the current user's nickname. 
  */
-const XOGame = ({ roomId, room, nickname }) => {
+const XOGame = ({ roomId, room, nickname, socket }) => {
   const [gameStart, setGameStart] = useState(false);
   const initialGameState = [
     ['', '', ''],
@@ -134,7 +132,7 @@ const XOGame = ({ roomId, room, nickname }) => {
       socket.off('gameStarted');
       socket.off('moveMade');
     }
-  }, [nickname]);
+  }, [socket, nickname]);
 
   const handleStartGame = (roomId) => {
       socket.emit('startGame', { gameType: 'xsAndOs', 'roomId': roomId });
@@ -259,6 +257,7 @@ const XOGame = ({ roomId, room, nickname }) => {
  */
 const XsAndOs = () => {
   const router = useRouter();
+  const socket = useSocket();
   const { nickname: encodedNickname } = router.query;
   const nickname = decodeURIComponent(encodedNickname);
 
@@ -281,7 +280,7 @@ const XsAndOs = () => {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [roomId, nickname]);
+  }, [socket, roomId, nickname]);
     
   useEffect(() => {
     socket.on('roomCreated', ({ roomId, room }) => {
@@ -312,7 +311,7 @@ const XsAndOs = () => {
       socket.off('roomJoined');
       socket.off('error');
     }
-  }, []);
+  }, [socket]);
 
   const handleCreateRoom = () => {
     socket.emit('createRoom', { gameType: 'xsAndOs', nickname: nickname});
@@ -413,6 +412,7 @@ const XsAndOs = () => {
               room={room}
               nickname={nickname}
               handleLeaveRoom={handleLeaveRoom}
+              socket={socket}
             />
             :
             <XODescription

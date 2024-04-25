@@ -1,0 +1,11 @@
+build:
+  docker:
+    web: server/Dockerfile
+
+release:
+  image: web
+  command:
+    - echo "Deployed Couchbox Backend Server!!!"
+
+run:
+  web: npm start

@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://couchbox-f5c9bf2b16d5.herokuapp.com"],
     methods: ["GET", "POST"]
   }
 });
@@ -18,6 +18,13 @@ const PORT = process.env.PORT || 8000;
 
 const rooms = {};
 const playerSessions = {};
+
+app.get('/config', (req, res) => {
+  const config = {
+    socketUrl: process.env.SOCKET_URL || "http://localhost:8000"
+  };
+  res.json(config);
+});
 
 // Auxiliary Functions
 function generateRoomId() {
