@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://couchbox-f5c9bf2b16d5.herokuapp.com"],
+    origin: ["http://localhost:3000", "https://couchbox.netlify.app"],
     methods: ["GET", "POST"]
   }
 });
