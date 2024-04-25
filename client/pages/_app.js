@@ -14,11 +14,6 @@ export default function MyApp({ Component, pageProps }) {
       <Head>
         <title>couchbox</title>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
-        <style>
-          {`
-            @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
-          `}
-        </style>
       </Head>
       <SocketProvider>
         <ThemeProvider theme={theme}>

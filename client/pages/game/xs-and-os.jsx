@@ -155,14 +155,10 @@ const XOGame = ({ roomId, room, nickname, socket }) => {
   };
 
   const handleCellClick = (row, col) => {
-    console.log(`Clicked cell ${row}, ${col} Game started: ${gameStart}, Current turn: ${currentTurn}`);
     if (gameState[row]?.[col] === '' && gameStart && currentTurn === nickname) {
-      console.log("Making Move")
       const move = { row, col, player: playerSymbol };
       socket.emit('xsAndOsMove', { roomId, move });
-    } else {
-      console.log("Not Making Move");
-    }
+    };
   };
 
   return (
@@ -215,9 +211,9 @@ const XOGame = ({ roomId, room, nickname, socket }) => {
                 Start Game
               </Button>
             ) : (
-              <Typography component="div">
-                  {currentTurn === nickname ? "Your Turn" : "Opponent's Turn"}
-                  <Chip label={`${playerSymbol} (You)`} color="primary" variant="outlined" />
+              <Typography component="div" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {currentTurn === nickname ? "Your Turn" : "Opponent's Turn"}
+                <Chip label={`${playerSymbol} (You)`} color="primary" variant="outlined" />
               </Typography>
             )
           }

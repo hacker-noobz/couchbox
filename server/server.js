@@ -29,7 +29,7 @@ app.get('/config', (req, res) => {
 // Auxiliary Functions
 function generateRoomId() {
   // Create a room id
-  return Math.random().toString(36).substring(2, 9);
+  return Math.random().toString(36).substring(2, 8);
 }
 
 function createRoom(roomId, gameType, playerId) {
