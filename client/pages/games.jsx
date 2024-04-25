@@ -1,17 +1,10 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Alert, Box, Button, Chip, Typography, Grid, Card, CardContent, CardMedia, CardActionArea, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-
-const games = [
-    { name: 'Xs and Os', description: 'Simple naughts and crosses!', status: true, imageName: '/xs_os.svg', colour: '#25309B', detailedInfo: 'Tic-tac-toe, noughts and crosses, or Xs and Os is a paper-and-pencil game for two players who take turns marking the spaces in a three-by-three grid with X or O. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row is the winner.', numPlayers: '2'},
-    { name: 'Spy Hunt', description: 'Find the Spy!', status: false, imageName: '/spy_hunt.svg', colour: '#783035', detailedInfo: 'In Spy Hunt one person is the spy (or two if you have many players) and the rest of the players are non-spies who receive a secret location. The players ask each other questions to figure out who does not know the location (and hence, is the spy).', numPlayers: '2-8'},
-    { name: 'Password', description: 'Guess the password!', status: false, imageName: '/pass_word.svg', colour: '#C98D09', detailedInfo: 'In two teams, two rival wordmasters know the secret password and must provide clever clues to help their own team guess the password. However, they must not give away clues that are too obvious, to ensure that their team guesses it first!', numPlayers: '2-8'},
-    { name: 'Code Words', description: 'Find the code words!', status: false, imageName: '/code_words.svg', colour: '#963D41', detailedInfo: 'Two rival spymasters know the secret identities of 25 agents. Their teammates know the agents only by their codenames. To win the game, your team will need to contact all of your agents in the field before the other team finds their own agents. And watch out for the assassin – meet him in the field and your team is done!', numPlayers: '2-8'},
-    { name: 'Line Four', description: 'Connect Four!', status: false, imageName: '/line_four.svg', colour: '#33D9B2', detailedInfo: 'Two rival players go head to head dropping tokens in a grid, fighting to be the first to form a horizontal, vertical or diagonal line of four.', numPlayers: '2'},
-];
+import { useApi } from '../contexts/apiProvider';
 
 /**
  * Games: main landing page for all games available to be played.
@@ -20,6 +13,8 @@ const games = [
 const Games = () => {
   const router = useRouter();
   const nickname = router.query;
+  const { get } = useApi();
+  const [games, setGames] = useState([]);
   const [openDialog, setOpenDialog] = useState(null);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -53,31 +48,35 @@ const Games = () => {
     }
   }
   
-  // TODO: Retrieve the available games from the backend as opposed to the hardcoded object at the top of the file.
+  useEffect(() => {
+    get('list_games')
+      .then(setGames)
+      .catch(console.error);
+  }, []);
 
-    return (
-      <Box sx={{ flexGrow: 1, p: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-          <IconButton aria-label="home" size="large" onClick={handleClick}>
-            <HomeIcon fontSize="inherit"/>
-          </IconButton>
+  return (
+    <Box sx={{ flexGrow: 1, p: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+        <IconButton aria-label="home" size="large" onClick={handleClick}>
+          <HomeIcon fontSize="inherit"/>
+        </IconButton>
                 
-          <Typography
-            variant="h4"
-            component="h1"
-            gutterBottom
-            sx={{
-              fontFamily: 'JetBrains Mono, monospace',
-              color: '#66509F',
-            }}
-          >
-            Available Games
-          </Typography>
-          <Box sx={{ width: 48, height: 48 }}/>
-        </Box>
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{
+            fontFamily: 'JetBrains Mono, monospace',
+            color: '#66509F',
+          }}
+        >
+          Available Games
+        </Typography>
+        <Box sx={{ width: 48, height: 48 }}/>
+      </Box>
             
-        <Grid container spacing={4}>
-          {games.map((game, index) => (
+      <Grid container spacing={4}>
+        {games.map((game, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
             <Card sx={{ "&:hover": { boxShadow: 8 } }}>
               <CardActionArea onClick={() => handleClickOpenDialog(game.name)}>
