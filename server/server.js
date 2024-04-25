@@ -42,6 +42,7 @@ app.get('/api/list_games', (req, res) => {
     { name: 'Password', description: 'Guess the password!', status: false, imageName: '/pass_word.svg', colour: '#C98D09', detailedInfo: 'In two teams, two rival wordmasters know the secret password and must provide clever clues to help their own team guess the password. However, they must not give away clues that are too obvious, to ensure that their team guesses it first!', numPlayers: '2-8'},
     { name: 'Code Words', description: 'Find the code words!', status: false, imageName: '/code_words.svg', colour: '#963D41', detailedInfo: 'Two rival spymasters know the secret identities of 25 agents. Their teammates know the agents only by their codenames. To win the game, your team will need to contact all of your agents in the field before the other team finds their own agents. And watch out for the assassin – meet him in the field and your team is done!', numPlayers: '2-8'},
     { name: 'Line Four', description: 'Connect Four!', status: false, imageName: '/line_four.svg', colour: '#33D9B2', detailedInfo: 'Two rival players go head to head dropping tokens in a grid, fighting to be the first to form a horizontal, vertical or diagonal line of four.', numPlayers: '2'},
+    { name: 'Where Wolf?', description: 'Where is the Wolf?', status: false, imageName: '/where_wolf.svg', colour: '#1E0B18', detailedInfo: 'Experience a conflict between two groups: an informed minority (the Werewolves) and an uninformed majority (the Villagers)', numPlayers: '4-8'},
   ];
   res.json(games);
 });
