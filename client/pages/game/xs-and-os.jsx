@@ -7,6 +7,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PersonIcon from '@mui/icons-material/Person';
 import { useSocket } from '../../contexts/socketProvider';
+import useRoomManager from '../../hooks/roomManager';
 
 const gameDetails = { name: 'Xs and Os', description: 'Simple naughts and crosses!', status: true, imageName: '/xs_os.svg', colour: '#25309B', detailedInfo: 'Tic-tac-toe, noughts and crosses, or Xs and Os is a paper-and-pencil game for two players who take turns marking the spaces in a three-by-three grid with X or O. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row is the winner.', numPlayers: '2'};
 const gameRules = "The game is played on a grid that is 3 squares by 3 squares. One player is randomly selected as X and the other is O. Players take turns putting their marks in empty squares. The first player to get 3 of their marks in a row (up, down, across, or diagonally) is the winner. When all 9 squares are full, the game is over. If no player has 3 marks in a row, the game ends in a tie."
@@ -36,7 +37,7 @@ const XODescription = ({ nickname, handleCreateRoom, handleJoinRoom }) => {
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
           <Button
-            onClick={handleCreateRoom}
+            onClick={() => handleCreateRoom('xsAndOs')}
             variant="outlined"
             sx={{
                 mt: 2,
@@ -253,86 +254,25 @@ const XOGame = ({ roomId, room, nickname, socket }) => {
  */
 const XsAndOs = () => {
   const router = useRouter();
-  const socket = useSocket();
   const { nickname: encodedNickname } = router.query;
   const nickname = decodeURIComponent(encodedNickname);
 
-  // Error management
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-
-  // Room state management
-  const [roomId, setRoomId] = useState("");
-  const [room, setRoom] = useState({});
-  const [roomJoined, setRoomJoined] = useState(false);
-
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      socket.emit('leaveRoom', { roomId, nickname });
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [socket, roomId, nickname]);
+  const socket = useSocket();
+  const {
+    roomId,
+    room,
+    roomJoined,
+    alertMessage,
+    alertOpen,
+    setAlertOpen,
+    handleJoinRoom,
+    handleLeaveRoom,
+    handleCreateRoom
+  } = useRoomManager(nickname);
     
-  useEffect(() => {
-    socket.on('roomCreated', ({ roomId, room }) => {
-      setRoomId(roomId);
-      setRoomJoined(true);
-      setRoom(room);
-    });
-
-    socket.on('roomJoined', room => {
-      setRoomJoined(true);
-      setRoom(room);
-    });
-
-    socket.on('playerLeft', ({ nickname }) => {
-      setRoom(prevRoom => ({
-        ...prevRoom,
-        players: prevRoom.players.filter(player => player !== nickname)
-      }));
-    });
-
-    socket.on('error', message => {
-      setAlertMessage(message);
-      setAlertOpen(true);
-    });
-
-    return () => {
-      socket.off('roomCreated');
-      socket.off('roomJoined');
-      socket.off('error');
-    }
-  }, [socket]);
-
-  const handleCreateRoom = () => {
-    socket.emit('createRoom', { gameType: 'xsAndOs', nickname: nickname});
-  };
-
-  const handleJoinRoom = (roomId, nickname) => {
-    if (roomId && nickname) {
-      socket.emit('joinRoom', { roomId, nickname });
-      setRoomId(roomId);
-    } else {
-      setAlertMessage('Please enter a valid room code.');
-      setAlertOpen(true);
-    }
-  };
-
-  const handleLeaveRoom = (roomId, nickname) => {
-    setRoomJoined(false);
-    setRoom({});
-    setRoomId("");
-    socket.emit('leaveRoom', { roomId, nickname });
-  };
-
-  const handleNavigateHome = (roomId, nickname) => {
+  const handleNavigateHome = () => {
     if (roomJoined) {
-      handleLeaveRoom(roomId, nickname);
+      handleLeaveRoom();
     } else {
       const gamesPath = `/games?nickname=${encodeURIComponent(nickname)}`;
       router.push(gamesPath);
@@ -407,7 +347,6 @@ const XsAndOs = () => {
               roomId={roomId}
               room={room}
               nickname={nickname}
-              handleLeaveRoom={handleLeaveRoom}
               socket={socket}
             />
             :

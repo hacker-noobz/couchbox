@@ -10,7 +10,6 @@ export const ApiProvider = ({ children }) => {
 
   // Function to make GET requests
   const get = async (endpoint) => {
-    console.log(`TRYING: ${apiUrl}/${endpoint}`);
     try {
       const response = await fetch(`${apiUrl}/${endpoint}`);
       if (!response.ok) throw new Error('Network response was not ok');
