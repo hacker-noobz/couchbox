@@ -8,16 +8,20 @@ export const useSocket = () => useContext(SocketContext);
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   useEffect(() => {
-    fetch('/config')
-      .then(response => response.json())
-      .then(config => {
-        console.log('Retrieved socket URL: ', config.socketUrl);
-        const newSocket = io(config.socketUrl);
-        setSocket(newSocket);
-        console.log('Socket initialized');
-        
-        return () => newSocket.close();
-      }).catch(error => console.error('Failed to fetch config:', error));
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
+    if (socketUrl) {
+      console.log('Using socket URL: ', socketUrl);
+      const newSocket = io(socketUrl);
+      setSocket(newSocket);
+      console.log('Socket initialized');
+
+      return () => {
+        newSocket.close();
+        console.log('Socket disconnected');
+      };
+    } else {
+      console.error('Socket URL not provided in environment variables');
+    }
   }, []);
 
   return (
