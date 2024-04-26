@@ -1,3 +1,26 @@
+function checkGameStart(rooms, roomId) {
+  if (!rooms[roomId]) {
+    console.log(`Room ${roomId} does not exist.`);
+    return false;
+  }
+
+  const currentRoom = rooms[roomId];
+  console.log(`Checking game start for room: ${JSON.stringify(currentRoom)}`);
+  if (currentRoom.players.length == 2) {
+    return true;
+  }
+
+  return false;
+}
+
+function createInitialGameState() {
+  return [
+    ['', '', ''],
+    ['', '', ''],
+    ['', '', '']
+];
+}
+
 const initializeGame = (rooms, roomId) => {
   if (!checkGameStart(rooms, roomId)) {
       return { error: 'Could not start game, not enough players or room does not exist.' };
@@ -26,67 +49,20 @@ const initializeGame = (rooms, roomId) => {
   };
 };
 
-function createInitialGameState() {
-    return [
-      ['', '', ''],
-      ['', '', ''],
-      ['', '', '']
-  ];
-}
   
 function joinRoom(rooms, roomId, playerId) {
   // Logic to join a room
   // Return true if the player successfully joined the room, false otherwise
-  if (rooms.hasOwnProperty(roomId) && !rooms[roomId].players.includes(playerId)) {
-      currentRoom = rooms[roomId];
-      // Check if the current room has too many players
-      if (currentRoom.players.length > 1) {
-          return false;
-      }
-
-      // Add the player to the room
-      currentRoom.players.push(playerId);
-
-      return true;
+  currentRoom = rooms[roomId];
+  // Check if the current room has too many players
+  if (currentRoom.players.length > 1) {
+      return { success: false, error: 'Room is full.'};
   }
 
-  return false;
-}
+  // Add the player to the room
+  currentRoom.players.push(playerId);
 
-function leaveRoom(rooms, roomId, playerId) {
-  // Logic to leave a room
-  // Returns true if tthe player successfully leaves the room, false otherwise
-  if (rooms.hasOwnProperty(roomId)) {
-    const currentRoom = rooms[roomId];
-    const playerIndex = currentRoom.players.indexOf(playerId);
-    if (playerIndex !== -1) {
-      currentRoom.players.splice(playerIndex, 1);
-    }
-
-    // If there are no players left in the room, delete the room
-    if (currentRoom.players.length === 0) {
-      delete rooms[roomId];
-    }
-
-    return true;
-  }
-
-  return false;
-}
-
-function checkGameStart(rooms, roomId) {
-  if (!rooms[roomId]) {
-    console.log(`Room ${roomId} does not exist.`);
-    return false;
-  }
-
-  const currentRoom = rooms[roomId];
-  console.log(`Checking game start for room: ${JSON.stringify(currentRoom)}`);
-  if (currentRoom.players.length == 2) {
-    return true;
-  }
-
-  return false;
+  return { success: true, error: 'Room joined successfully!'};
 }
 
 function checkWin(gameState, player) {
@@ -124,4 +100,4 @@ function makeMove(gameState, { row, col, player }) {
   return { gameState, error: 'Invalid move' };
 }
 
-module.exports = { createInitialGameState, joinRoom, leaveRoom, makeMove, checkGameStart, initializeGame };
+module.exports = { createInitialGameState, joinRoom, makeMove, checkGameStart, initializeGame };
