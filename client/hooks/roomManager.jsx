@@ -16,10 +16,10 @@ const useRoomManager = (initialNickname) => {
     }, [socket, initialNickname]);
 
     // Join room
-    const handleJoinRoom = useCallback((roomId, nickname) => {
+    const handleJoinRoom = useCallback((roomId, nickname, gameType) => {
         if (!socket) return;
-        if (roomId && nickname) {
-            socket.emit('joinRoom', { roomId, nickname });
+        if (roomId && nickname && gameType) {
+            socket.emit('joinRoom', { roomId, nickname, gameType });
             setRoomId(roomId);
         } else {
             setAlertMessage('Please enter a valid room code.');
@@ -49,8 +49,8 @@ const useRoomManager = (initialNickname) => {
             });
 
             socket.on('roomJoined', (data) => {
-                setRoomId(data.roomId);
-                setRoom(data.room);
+                setRoomId(data.id);
+                setRoom(data);
                 setRoomJoined(true);
             });
 
