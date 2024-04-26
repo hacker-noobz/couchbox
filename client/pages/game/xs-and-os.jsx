@@ -12,6 +12,12 @@ import useRoomManager from '../../hooks/roomManager';
 const gameDetails = { name: 'Xs and Os', description: 'Simple naughts and crosses!', status: true, imageName: '/xs_os.svg', colour: '#25309B', detailedInfo: 'Tic-tac-toe, noughts and crosses, or Xs and Os is a paper-and-pencil game for two players who take turns marking the spaces in a three-by-three grid with X or O. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row is the winner.', numPlayers: '2'};
 const gameRules = "The game is played on a grid that is 3 squares by 3 squares. One player is randomly selected as X and the other is O. Players take turns putting their marks in empty squares. The first player to get 3 of their marks in a row (up, down, across, or diagonally) is the winner. When all 9 squares are full, the game is over. If no player has 3 marks in a row, the game ends in a tie."
 
+// Mapping playerSymbol to corresponding hex colors
+const colourMap = {
+  x: '#25309B',
+  o: '#9B2530'
+};
+
 /**
  * XODescription: information pane that contains rules about XsAndOs as well as functionality
  * options for the user to either create a room or join an existing room.
@@ -56,7 +62,7 @@ const XODescription = ({ nickname, handleCreateRoom, handleJoinRoom }) => {
           <TextField
             InputProps={{
                 endAdornment: (
-                    <IconButton onClick={() => handleJoinRoom(roomId, nickname)}>
+                    <IconButton onClick={() => handleJoinRoom(roomId, nickname, 'xsAndOs')}>
                         <ArrowForwardIosIcon />
                     </IconButton>
                 ),
@@ -148,7 +154,7 @@ const XOGame = ({ roomId, room, nickname, socket }) => {
     setGameDraw(false);
     setGameWon(false);
     setWinner('');
-    socket.emit('restartGame', roomId);
+    socket.emit('restartGame', { gameType: 'xsAndOs', 'roomId': roomId });
   };
 
   const handlePlayAgain = (roomId) => {
@@ -161,6 +167,8 @@ const XOGame = ({ roomId, room, nickname, socket }) => {
       socket.emit('xsAndOsMove', { roomId, move });
     };
   };
+
+  const chipColour = colourMap[playerSymbol.toLowerCase()] || '#666';
 
   return (
     <>
@@ -214,7 +222,11 @@ const XOGame = ({ roomId, room, nickname, socket }) => {
             ) : (
               <Typography component="div" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 {currentTurn === nickname ? "Your Turn" : "Opponent's Turn"}
-                <Chip label={`${playerSymbol} (You)`} color="primary" variant="outlined" />
+                <Chip 
+                  label={`${playerSymbol} (You)`}
+                  style={{ backgroundColor: chipColour, color: '#fff', borderColor: chipColour }}
+                  variant="outlined"
+                />
               </Typography>
             )
           }
