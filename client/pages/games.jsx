@@ -49,7 +49,7 @@ const Games = () => {
   }
   
   useEffect(() => {
-    get('list_games')
+    get('/api/list_games')
       .then(setGames)
       .catch(console.error);
   }, []);
