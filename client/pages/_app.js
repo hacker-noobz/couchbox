@@ -3,6 +3,7 @@ import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '../contexts/themeProvider';
 import { SocketProvider } from '../contexts/socketProvider';
 import { ApiProvider } from '../contexts/apiProvider';
+import '../styles/styles.css';
 
 export default function MyApp({ Component, pageProps }) {
   return (
