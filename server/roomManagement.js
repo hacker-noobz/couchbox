@@ -6,8 +6,14 @@ const lineFour = require('./games/lineFour')
  * @returns A randomly generated room ID
  */
 function generateRoomId() {
-    // Create a room id
-    return Math.random().toString(36).substring(2, 8);
+    const characters = 'abcdefghijklmnopqrstuvwxyz';
+    let result = '';
+    const charactersLength = characters.length;
+    for (let i = 0; i < 6; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    
+    return result;
 }
 
 /**
