@@ -18,6 +18,12 @@ export default function Home() {
     });
   };
 
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter' && nickname.trim()) {
+      handleClick();
+    }
+  };
+
   return (
     <Box display="flex" minHeight="100vh" flexDirection="column" justifyContent="flex-start">
       <Box flexGrow={1} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
@@ -30,7 +36,10 @@ export default function Home() {
         <TextField
           InputProps={{
             endAdornment: (
-              <IconButton onClick={handleClick}>
+              <IconButton
+                onClick={handleClick}
+                disabled={!nickname.trim()}
+              >
                 <ArrowForwardIosIcon />
               </IconButton>
             ),
@@ -39,6 +48,7 @@ export default function Home() {
           color="secondary"
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
+          onKeyPress={handleKeyPress}
         />
       </Box>
       <Box textAlign="center" display="flex" flexDirection="column" alignItems="center" justifyContent="center">
