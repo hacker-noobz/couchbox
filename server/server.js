@@ -6,6 +6,7 @@ const cors = require('cors');
 // Import Games
 const xsAndOs = require('./games/xsAndOs');
 const lineFour = require('./games/lineFour');
+const spyHunt = require('./games/spyHunt');
 // Import Room Management
 const roomManager = require('./roomManagement');
 // Import Game Management
@@ -43,13 +44,18 @@ app.get('/config', (req, res) => {
 app.get('/api/list_games', (req, res) => {
   const games = [
     { name: 'Xs and Os', description: 'Simple naughts and crosses!', status: true, imageName: '/xs_os.svg', colour: '#25309B', detailedInfo: 'Tic-tac-toe, noughts and crosses, or Xs and Os is a paper-and-pencil game for two players who take turns marking the spaces in a three-by-three grid with X or O. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row is the winner.', numPlayers: '2'},
-    { name: 'Spy Hunt', description: 'Find the Spy!', status: false, imageName: '/spy_hunt.svg', colour: '#783035', detailedInfo: 'In Spy Hunt one person is the spy (or two if you have many players) and the rest of the players are non-spies who receive a secret location. The players ask each other questions to figure out who does not know the location (and hence, is the spy).', numPlayers: '2-8'},
+    { name: 'Spy Hunt', description: 'Find the Spy!', status: true, imageName: '/spy_hunt.svg', colour: '#D88A2F', detailedInfo: 'In Spy Hunt one person is the spy (or two if you have many players) and the rest of the players are non-spies who receive a secret location. The players ask each other questions to figure out who does not know the location (and hence, is the spy).', numPlayers: '4-8'},
     { name: 'Password', description: 'Guess the password!', status: false, imageName: '/pass_word.svg', colour: '#C98D09', detailedInfo: 'In two teams, two rival wordmasters know the secret password and must provide clever clues to help their own team guess the password. However, they must not give away clues that are too obvious, to ensure that their team guesses it first!', numPlayers: '2-8'},
     { name: 'Code Words', description: 'Find the code words!', status: false, imageName: '/code_words.svg', colour: '#963D41', detailedInfo: 'Two rival spymasters know the secret identities of 25 agents. Their teammates know the agents only by their codenames. To win the game, your team will need to contact all of your agents in the field before the other team finds their own agents. And watch out for the assassin – meet him in the field and your team is done!', numPlayers: '2-8'},
     { name: 'Line Four', description: 'Connect Four!', status: true, imageName: '/line_four.svg', colour: '#33D9B2', detailedInfo: 'Two rival players go head to head dropping tokens in a grid, fighting to be the first to form a horizontal, vertical or diagonal line of four.', numPlayers: '2'},
     { name: 'Where Wolf?', description: 'Where is the Wolf?', status: false, imageName: '/where_wolf.svg', colour: '#1E0B18', detailedInfo: 'Experience a conflict between two groups: an informed minority (the Werewolves) and an uninformed majority (the Villagers)', numPlayers: '4-8'},
   ];
   res.json(games);
+});
+
+app.get('/api/spy_hunt/locations', (req, res) => {
+  const locations = spyHunt.locations;
+  res.json(locations);
 });
 
 io.on('connection', (socket) => {

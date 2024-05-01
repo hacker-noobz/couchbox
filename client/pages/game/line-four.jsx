@@ -34,7 +34,7 @@ const colourMap = {
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2}}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <PeopleIcon />
-            <Typography sx={{ ml: 1 }}>{`${gameDetails.numPlayers} player(s)`}</Typography>
+            <Typography sx={{ ml: 1 }}>{`${gameDetails.numPlayers} players`}</Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
             <InfoIcon sx={{ alignSelf: 'flex-start' }} />
@@ -273,6 +273,10 @@ const LineFourGame = ({ roomId, room, nickname, socket }) => {
   );
 };
 
+/**
+ * LineFour: the main LineFour screen that handles switching between the description and 
+ * game panes.
+ */
 const LineFour = () => {
     const router = useRouter();
     const { nickname: encodedNickname } = router.query;
