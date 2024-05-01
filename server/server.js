@@ -6,6 +6,7 @@ const cors = require('cors');
 // Import Games
 const xsAndOs = require('./games/xsAndOs');
 const lineFour = require('./games/lineFour');
+const spyHunt = require('./games/spyHunt');
 // Import Room Management
 const roomManager = require('./roomManagement');
 // Import Game Management
@@ -50,6 +51,11 @@ app.get('/api/list_games', (req, res) => {
     { name: 'Where Wolf?', description: 'Where is the Wolf?', status: false, imageName: '/where_wolf.svg', colour: '#1E0B18', detailedInfo: 'Experience a conflict between two groups: an informed minority (the Werewolves) and an uninformed majority (the Villagers)', numPlayers: '4-8'},
   ];
   res.json(games);
+});
+
+app.get('/api/spy_hunt/locations', (req, res) => {
+  const locations = spyHunt.locations;
+  res.json(locations);
 });
 
 io.on('connection', (socket) => {
