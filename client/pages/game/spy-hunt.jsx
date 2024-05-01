@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Alert, Box, Button, Chip, Dialog, DialogTitle, List, ListItem, ListItemText, IconButton, CardMedia, Grid, Paper, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Chip, Dialog, DialogTitle, List, ListItem, ListItemText, IconButton, CardMedia, TextField, Typography } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import InfoIcon from '@mui/icons-material/Info';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
