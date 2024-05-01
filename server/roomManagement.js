@@ -44,20 +44,21 @@ function createRoom(roomId, gameType, nickname) {
  * @param {string} nickname 
  */
 function joinRoom(rooms, roomId, gameType, nickname) {
-    if (!rooms.hasOwnProperty(roomId) || rooms[roomId].players.includes(nickname)) {
+    const lowercaseRoomCode = roomId.toLowerCase();
+    if (!rooms.hasOwnProperty(lowercaseRoomCode) || rooms[lowercaseRoomCode].players.includes(nickname)) {
         // If the room does not exist or the player trying to join the room is already
         // in the room, return false.
         let errorMessage = 'Player already exists in this room.';
-        if (!rooms.hasOwnProperty(roomId)) {
+        if (!rooms.hasOwnProperty(lowercaseRoomCode)) {
             errorMessage = 'Room does not exist.'
         }
         return { success: false, error: errorMessage };
     }
 
     if (gameType == 'xsAndOs') {
-        return xsAndOs.joinRoom(rooms, roomId, nickname);
+        return xsAndOs.joinRoom(rooms, lowercaseRoomCode, nickname);
     } else if (gameType == 'lineFour') {
-        return lineFour.joinRoom(rooms, roomId, nickname);
+        return lineFour.joinRoom(rooms, lowercaseRoomCode, nickname);
     }
 }
 
