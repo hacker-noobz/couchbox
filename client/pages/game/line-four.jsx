@@ -204,32 +204,7 @@ const LineFourGame = ({ roomId, room, nickname, socket }) => {
             </Button>
         </Box>
       </Dialog>
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-        <Grid container spacing={1} justifyContent="center" alignItems="center" sx={{ maxWidth: 800, margin: 'auto', padding: 1 }}>
-          {Array.from({ length: 6 }).map((_, rowIndex) => (
-            <Grid key={`row-${rowIndex}`} container item xs={16} spacing={1} justifyContent="center">
-              {Array.from({ length: 7 }).map((_, colIndex) => (
-                <Grid key={`cell-${rowIndex}-${colIndex}`} item xs={1}>
-                  <Paper
-                    elevation={3}
-                    sx={{
-                        height: 50,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                        backgroundImage: gameState[rowIndex]?.[colIndex] ? `url(/lineFour/${gameState[rowIndex][colIndex].toLowerCase()}.svg)` : 'none',
-                        backgroundSize: 'contain',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'center'
-                    }}
-                    onClick={() => handleCellClick(colIndex)}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          ))}
-        </Grid>
+      <Box sx={{ display: 'flex', flexDirection:'column' ,justifyContent: 'center', alignItems: 'center', width: '100%' }}>
         <Box sx={{ padding: 3, gap: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Typography>Room Code: {roomId}</Typography>
           <Typography>Players: {room.players.join(',')}</Typography>
@@ -264,6 +239,35 @@ const LineFourGame = ({ roomId, room, nickname, socket }) => {
               )
             }
         </Box>
+        <Grid container spacing={1} justifyContent="center" alignItems="center" sx={{ maxWidth: 800, margin: 'auto', padding: 1 }}>
+          {Array.from({ length: 6 }).map((_, rowIndex) => (
+            <Grid key={`row-${rowIndex}`} container item xs={16} spacing={1} justifyContent="center">
+              {Array.from({ length: 7 }).map((_, colIndex) => (
+                <Grid key={`cell-${rowIndex}-${colIndex}`} item xs={1}>
+                  <Paper
+                    elevation={3}
+                    sx={{
+                        width: '100%',
+                        paddingTop: '100%',
+                        position: 'relative',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        minHeight: '20px',
+                        minWidth: '20px',
+                        backgroundImage: gameState[rowIndex]?.[colIndex] ? `url(/lineFour/${gameState[rowIndex][colIndex].toLowerCase()}.svg)` : 'none',
+                        backgroundSize: '60%',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center'
+                    }}
+                    onClick={() => handleCellClick(colIndex)}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          ))}
+        </Grid>
       </Box>  
     </>
   );

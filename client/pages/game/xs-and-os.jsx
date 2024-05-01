@@ -34,11 +34,11 @@ const XODescription = ({ nickname, handleCreateRoom, handleJoinRoom }) => {
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2}}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <PeopleIcon />
-            <Typography sx={{ ml: 1 }}>{`${gameDetails.numPlayers} player(s)`}</Typography>
+            <Typography variant='body1' sx={{ ml: 1 }}>{`${gameDetails.numPlayers} player(s)`}</Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
             <InfoIcon sx={{ alignSelf: 'flex-start' }} />
-            <Typography>{gameRules}</Typography>
+            <Typography variant='body1' >{gameRules}</Typography>
           </Box>
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
@@ -58,7 +58,7 @@ const XODescription = ({ nickname, handleCreateRoom, handleJoinRoom }) => {
           >
             Create Room
           </Button>
-          <Typography>OR</Typography>
+          <Typography variant='body1' >OR</Typography>
           <TextField
             InputProps={{
                 endAdornment: (
@@ -239,7 +239,10 @@ const XOGame = ({ roomId, room, nickname, socket }) => {
                 <Paper
                   elevation={3}
                   sx={{
-                      height: 100,
+                      width: '15vw',
+                      height: '15vw',
+                      maxWidth: '100px',
+                      maxHeight: '100px',
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
@@ -316,7 +319,7 @@ const XsAndOs = () => {
         flexGrow: 1, 
         p: 3,
         width: '100%',
-        maxHeight: '100vh'
+        maxHeight: '100vh',
       }}>
         <Box sx={{ 
           display: 'flex', 
@@ -351,7 +354,7 @@ const XsAndOs = () => {
             border: "1px solid",
             borderColor: "primary.main",
             marginTop: 2,
-            paddingBottom: 2,
+            paddingBottom: 0,
           }}
         >
           {roomJoined ?
