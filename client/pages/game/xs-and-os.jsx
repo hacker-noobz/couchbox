@@ -34,7 +34,7 @@ const XODescription = ({ nickname, handleCreateRoom, handleJoinRoom }) => {
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2}}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <PeopleIcon />
-            <Typography variant='body1' sx={{ ml: 1 }}>{`${gameDetails.numPlayers} player(s)`}</Typography>
+            <Typography variant='body1' sx={{ ml: 1 }}>{`${gameDetails.numPlayers} players`}</Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
             <InfoIcon sx={{ alignSelf: 'flex-start' }} />
