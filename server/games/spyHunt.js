@@ -31,6 +31,7 @@ function checkGameStart(rooms, roomId) {
 
   return false;
 }
+
 const initializeGame = (rooms, roomId) => {
   if (!checkGameStart(rooms, roomId)) {
       return { error: 'Could not start game, not enough players or room does not exist.' };
