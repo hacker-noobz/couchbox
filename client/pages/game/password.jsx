@@ -259,7 +259,7 @@ const PasswordGame = ({ roomId, room, nickname, socket }) => {
                   )
                 }
                 <Typography component="div" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  {currentTurn}'s Turn
+                  {`${currentTurn}'s Turn`}
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={6} sx={{ textAlign: 'center' }}>
