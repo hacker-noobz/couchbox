@@ -32,6 +32,7 @@ export default function Home() {
           alt="couchbox"
           width={500}
           height={300}
+          className='bouncing'
         />
         <TextField
           InputProps={{
@@ -51,7 +52,7 @@ export default function Home() {
           onKeyPress={handleKeyPress}
         />
         <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ width: '100%', marginTop: 2 }}>
-          {['code_words', 'line_four', 'pass_word', 'spy_hunt', 'where_wolf', 'xs_os'].map((logo, index) => (
+          {['shades_tones', 'line_four', 'pass_word', 'spy_hunt', 'where_wolf', 'xs_os'].map((logo, index) => (
             <Grid item key={index}>
               <Box sx={{
                 opacity: 0.3,
