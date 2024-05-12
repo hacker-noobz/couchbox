@@ -1,36 +1,12 @@
-.rotatingImages {
-  position: absolute;
-  width: 100%;  /* Cover the viewport width */
-  height: 100vh; /* Cover the viewport height */
-  top: 0;       /* Start from the top */
-  left: 0;      /* Start from the left */
-  display: flex;
-  align-items: center; /* Center items vertically */
-  justify-content: center; /* Center items horizontally */
-  animation: rotate 60s linear infinite; /* Adjust time as needed */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
-.image {
-  position: absolute;
-  width: 100px; /* Fixed size for images */
-  height: 100px;
-  background-size: cover;
-  transform-origin: 50vw 50vh; /* Rotate around the center of the viewport */
-}
-
-/* Specific transforms for each image */
-.image:nth-child(1) { transform: rotate(0deg) translate(250px); }
-.image:nth-child(2) { transform: rotate(60deg) translate(250px); }
-.image:nth-child(3) { transform: rotate(120deg) translate(250px); }
-.image:nth-child(4) { transform: rotate(180deg) translate(250px); }
-.image:nth-child(5) { transform: rotate(240deg) translate(250px); }
-.image:nth-child(6) { transform: rotate(300deg) translate(250px); }
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.bouncing {
+  animation: bounce 1s infinite;
 }

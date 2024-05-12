@@ -13,7 +13,7 @@ import PinIcon from '@mui/icons-material/Pin';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 
-const gameDetails = { name: 'Password', description: 'Guess the password!', status: true, imageName: '/pass_word.svg', colour: '#FB587A', detailedInfo: 'In two teams, two rival wordmasters know the secret password and must provide clever clues to help their own team guess the password. However, they must not give away clues that are too obvious, to ensure that their team guesses it first!', numPlayers: '2-8'};
+const gameDetails = { name: 'Password', description: 'Guess the password!', status: true, imageName: '/pass_word.svg', colour: '#FB587A', detailedInfo: 'In two teams, two rival wordmasters know the secret password and must provide clever clues to help their own team guess the password. However, they must not give away clues that are too obvious, to ensure that their team guesses it first!', numPlayers: '4-8'};
 const gameRules = "Two teams have an elected clue giver and each team has turns guessing based on a clue given by the selected individual. The clue givers from both teams know the chosen word. The clues should be vague but not too obvious to the point where it can be easily guessed. The team to guess the word first wins!"
 
 /**

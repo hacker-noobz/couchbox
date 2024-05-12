@@ -36,5 +36,5 @@ Welcome to Couchbox, the ultimate destination for friends to gather and play a v
 ![alt text](/client/public/banners/line_four.svg "Line Four")
 ![alt text](/client/public/banners/pass_word.svg "Pass Word")
 ![alt text](/client/public/banners/spy_hunt.svg "Spy Hunt")
-![alt text](/client/public/banners/code_words.svg "Code Words")
+![alt text](/client/public/banners/shades_tones.svg "Shades and Tones")
 ![alt text](/client/public/banners/where_wolf.svg "Where Wolf")
