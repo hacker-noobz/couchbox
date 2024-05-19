@@ -1,4 +1,14 @@
-const passwords = ['chocolate', 'volleyball', 'edward'];
+const passwords = ['chocolate', 'volleyball', 'edward', 'firefighter', 'orchestra', 'universe', 'chocolate', 'adventure',
+  'harmony', 'blueprint', 'avalanche', 'detective', 'symphony',
+  'treasure', 'cathedral', 'avalanche', 'tornado', 'treasure',
+  'pirate', 'squirrel', 'bamboo', 'rainbow', 'lighthouse',
+  'whisper', 'secret', 'enigma', 'blizzard', 'galaxy',
+  'serenade', 'whisper', 'jungle', 'atlantis', 'monsoon',
+  'waterfall', 'symphony', 'horizon', 'butterfly', 'mirage',
+  'conqueror', 'dragonfly', 'oasis', 'adventure', 'serenity',
+  'phoenix', 'mirage', 'blossom', 'quest', 'eclipse',
+  'paradise', 'universe', 'illusion', 'discovery', 'atlantis'
+];
 
 function checkGameStart(rooms, roomId) {
   if (!rooms[roomId]) {
@@ -8,7 +18,7 @@ function checkGameStart(rooms, roomId) {
 
   const currentRoom = rooms[roomId];
   console.log(`Checking game start for room: ${JSON.stringify(currentRoom)}`);
-  if (currentRoom.players.length >= 2 && currentRoom.players.length <=8) {
+  if (currentRoom.players.length >= 4 && currentRoom.players.length <= 8) {
     return true;
   }
 
