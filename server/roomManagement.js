@@ -2,6 +2,7 @@ const xsAndOs = require('./games/xsAndOs')
 const lineFour = require('./games/lineFour')
 const spyHunt = require('./games/spyHunt')
 const password = require('./games/password')
+const shadesAndTones = require('./games/shadesAndTones')
 
 /**
  * generateRoomId: Creates a room ID
@@ -65,6 +66,8 @@ function joinRoom(rooms, roomId, gameType, nickname) {
         return spyHunt.joinRoom(rooms, lowercaseRoomCode, nickname);
     } else if (gameType == 'password') {
         return password.joinRoom(rooms, lowercaseRoomCode, nickname);
+    } else if (gameType == 'shadesAndTones') {
+        return shadesAndTones.joinRoom(rooms, lowercaseRoomCode, nickname);
     }
 }
 

@@ -41,7 +41,7 @@ const gameRules = "Two teams have an elected clue giver and each team has turns 
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
           <Button
-            onClick={() => handleCreateRoom('spyHunt')}
+            onClick={() => handleCreateRoom('password')}
             variant="outlined"
             sx={{
                 mt: 2,
@@ -61,7 +61,7 @@ const gameRules = "Two teams have an elected clue giver and each team has turns 
           <TextField
             InputProps={{
                 endAdornment: (
-                    <IconButton onClick={() => handleJoinRoom(roomId, nickname, 'spyHunt')}>
+                    <IconButton onClick={() => handleJoinRoom(roomId, nickname, 'password')}>
                         <ArrowForwardIosIcon />
                     </IconButton>
                 ),
@@ -406,7 +406,7 @@ const Password = () => {
             <CardMedia
               component="img"
               image="/banners/pass_word.svg"
-              alt="Spy Hunt"
+              alt="Password"
               sx={{ maxWidth: "60%", height: "20vh" }}
             />
             <Box sx={{ 
